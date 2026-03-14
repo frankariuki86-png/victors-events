@@ -1,0 +1,53 @@
+import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
+import { config } from "./config.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
+import serviceRoutes from "./routes/serviceRoutes.js";
+import portfolioRoutes from "./routes/portfolioRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+
+const app = express();
+
+app.use(helmet());
+app.use(
+  cors({
+    origin: config.frontendUrl,
+    credentials: true
+  })
+);
+app.use(express.json({ limit: "1mb" }));
+app.use(morgan("dev"));
+
+app.use(
+  "/api/auth/login",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 25,
+    standardHeaders: true,
+    legacyHeaders: false
+  })
+);
+
+app.get("/api/health", (_, res) => {
+  res.json({ status: "ok", service: "victors-events-api" });
+});
+
+// Route modules encapsulate table-specific Supabase CRUD and validation.
+app.use("/api/auth", authRoutes);
+app.use("/api/bookings", bookingRoutes);
+app.use("/api/services", serviceRoutes);
+app.use("/api/portfolio", portfolioRoutes);
+app.use("/api/payments", paymentRoutes);
+
+app.use((err, _, res, __) => {
+  console.error(err);
+  res.status(500).json({ message: "Internal server error" });
+});
+
+app.listen(config.port, () => {
+  console.log(`Victor's Events API listening on port ${config.port}`);
+});
