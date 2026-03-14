@@ -12,10 +12,21 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 
 const app = express();
 
+const normalizeOrigin = (value) => String(value || "").trim().replace(/\/+$/, "");
+const allowedOrigins = new Set(config.frontendUrls.map(normalizeOrigin));
+
 app.use(helmet());
 app.use(
   cors({
-    origin: config.frontendUrl,
+    origin(origin, callback) {
+      // Allow server-to-server and curl requests that do not send Origin.
+      if (!origin) return callback(null, true);
+
+      const normalizedOrigin = normalizeOrigin(origin);
+      if (allowedOrigins.has(normalizedOrigin)) return callback(null, true);
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true
   })
 );
