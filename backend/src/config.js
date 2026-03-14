@@ -20,6 +20,7 @@ export const config = {
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+  supabaseStorageBucket: process.env.SUPABASE_STORAGE_BUCKET || "site-media",
   smtpHost: process.env.SMTP_HOST,
   smtpPort: Number(process.env.SMTP_PORT || 587),
   smtpUser: process.env.SMTP_USER,

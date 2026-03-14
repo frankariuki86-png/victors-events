@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../lib/api";
@@ -18,11 +18,17 @@ const portfolioTemplate = {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
+  const serviceFileInputRef = useRef(null);
+  const portfolioFileInputRef = useRef(null);
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
   const [portfolio, setPortfolio] = useState([]);
   const [serviceForm, setServiceForm] = useState(serviceTemplate);
   const [portfolioForm, setPortfolioForm] = useState(portfolioTemplate);
+  const [serviceImageFile, setServiceImageFile] = useState(null);
+  const [portfolioImageFile, setPortfolioImageFile] = useState(null);
+  const [isUploadingServiceImage, setIsUploadingServiceImage] = useState(false);
+  const [isUploadingPortfolioImage, setIsUploadingPortfolioImage] = useState(false);
 
   const fetchAll = async () => {
     try {
@@ -80,15 +86,47 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const { data } = await api.post("/uploads/image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+
+    return data?.image_url;
+  };
+
   const addService = async (e) => {
     e.preventDefault();
+
+    if (!serviceImageFile && !serviceForm.image_url.trim()) {
+      toast.error("Add an image file or paste an image URL");
+      return;
+    }
+
     try {
-      await api.post("/services", serviceForm);
+      setIsUploadingServiceImage(true);
+      const image_url = serviceImageFile
+        ? await uploadImage(serviceImageFile)
+        : serviceForm.image_url.trim();
+
+      await api.post("/services", {
+        ...serviceForm,
+        image_url
+      });
+
       setServiceForm(serviceTemplate);
+      setServiceImageFile(null);
+      if (serviceFileInputRef.current) serviceFileInputRef.current.value = "";
       toast.success("Service added");
       fetchAll();
-    } catch {
-      toast.error("Failed to add service");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to add service");
+    } finally {
+      setIsUploadingServiceImage(false);
     }
   };
 
@@ -128,13 +166,32 @@ export default function AdminDashboardPage() {
 
   const addPortfolio = async (e) => {
     e.preventDefault();
+
+    if (!portfolioImageFile && !portfolioForm.image_url.trim()) {
+      toast.error("Add an image file or paste an image URL");
+      return;
+    }
+
     try {
-      await api.post("/portfolio", portfolioForm);
+      setIsUploadingPortfolioImage(true);
+      const image_url = portfolioImageFile
+        ? await uploadImage(portfolioImageFile)
+        : portfolioForm.image_url.trim();
+
+      await api.post("/portfolio", {
+        ...portfolioForm,
+        image_url
+      });
+
       setPortfolioForm(portfolioTemplate);
+      setPortfolioImageFile(null);
+      if (portfolioFileInputRef.current) portfolioFileInputRef.current.value = "";
       toast.success("Portfolio image added");
       fetchAll();
-    } catch {
-      toast.error("Failed to add portfolio item");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to add portfolio item");
+    } finally {
+      setIsUploadingPortfolioImage(false);
     }
   };
 
@@ -208,8 +265,17 @@ export default function AdminDashboardPage() {
               <input className="rounded border p-2" placeholder="Title" value={serviceForm.title} onChange={(e) => setServiceForm((s) => ({ ...s, title: e.target.value }))} required />
               <textarea className="rounded border p-2" placeholder="Description" value={serviceForm.description} onChange={(e) => setServiceForm((s) => ({ ...s, description: e.target.value }))} required />
               <input className="rounded border p-2" type="number" placeholder="Price" value={serviceForm.price} onChange={(e) => setServiceForm((s) => ({ ...s, price: e.target.value }))} required />
-              <input className="rounded border p-2" placeholder="Image URL" value={serviceForm.image_url} onChange={(e) => setServiceForm((s) => ({ ...s, image_url: e.target.value }))} required />
-              <button className="rounded bg-brand-plum px-4 py-2 text-white">Add Service</button>
+              <input className="rounded border p-2" placeholder="Image URL (optional)" value={serviceForm.image_url} onChange={(e) => setServiceForm((s) => ({ ...s, image_url: e.target.value }))} />
+              <input
+                ref={serviceFileInputRef}
+                className="rounded border p-2"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={(e) => setServiceImageFile(e.target.files?.[0] || null)}
+              />
+              <button disabled={isUploadingServiceImage} className="rounded bg-brand-plum px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-70">
+                {isUploadingServiceImage ? "Uploading image..." : "Add Service"}
+              </button>
             </form>
             <div className="mt-4 space-y-2 text-sm">
               {services.map((service) => (
@@ -227,9 +293,18 @@ export default function AdminDashboardPage() {
           <div className="glass-card p-4">
             <h2 className="mb-3 font-display text-2xl text-brand-grape">Manage Portfolio</h2>
             <form onSubmit={addPortfolio} className="grid gap-3">
-              <input className="rounded border p-2" placeholder="Image URL" value={portfolioForm.image_url} onChange={(e) => setPortfolioForm((p) => ({ ...p, image_url: e.target.value }))} required />
+              <input className="rounded border p-2" placeholder="Image URL (optional)" value={portfolioForm.image_url} onChange={(e) => setPortfolioForm((p) => ({ ...p, image_url: e.target.value }))} />
+              <input
+                ref={portfolioFileInputRef}
+                className="rounded border p-2"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={(e) => setPortfolioImageFile(e.target.files?.[0] || null)}
+              />
               <input className="rounded border p-2" placeholder="Description" value={portfolioForm.description} onChange={(e) => setPortfolioForm((p) => ({ ...p, description: e.target.value }))} required />
-              <button className="rounded bg-brand-plum px-4 py-2 text-white">Add Portfolio Item</button>
+              <button disabled={isUploadingPortfolioImage} className="rounded bg-brand-plum px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-70">
+                {isUploadingPortfolioImage ? "Uploading image..." : "Add Portfolio Item"}
+              </button>
             </form>
             <div className="mt-4 space-y-2 text-sm">
               {portfolio.map((item) => (

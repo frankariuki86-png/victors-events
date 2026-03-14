@@ -9,6 +9,7 @@ import serviceRoutes from "./routes/serviceRoutes.js";
 import portfolioRoutes from "./routes/portfolioRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.use((err, _, res, __) => {
   console.error(err);
