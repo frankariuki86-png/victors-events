@@ -11,13 +11,13 @@ export default function HeroSection() {
           className="space-y-5"
         >
           <p className="inline-flex rounded-full border border-brand-plum/20 bg-white px-4 py-1 text-xs font-bold uppercase tracking-[0.2em] text-brand-plum">
-            Nakuru Premium Events
+            Jerusalem Building, Nakuru
           </p>
           <h1 className="font-display text-4xl font-extrabold leading-tight text-brand-grape md:text-6xl">
-            Victor's Events - Your 24/7 Event Partner
+            We Turn Your Events into Unforgettable Memories
           </h1>
           <p className="max-w-xl text-lg text-slate-700">
-            From wedding tents to full catering and honeymoon bookings, we design stylish events that become lifelong memories.
+            From intimate gatherings to grand celebrations, Victor&apos;s Events delivers creativity, reliability, and customer-centric service for every occasion.
           </p>
           <div className="flex flex-wrap gap-3">
             <a href="#booking" className="rounded-full bg-brand-plum px-6 py-3 font-bold text-white shadow-glow transition hover:bg-brand-grape">

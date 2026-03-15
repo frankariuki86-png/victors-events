@@ -12,7 +12,7 @@ export default function PortfolioSection({ portfolio }) {
         <SectionTitle
           eyebrow="Our Gallery"
           title="Portfolio of Recent Events"
-          subtitle="A snapshot of wedding decor, tent setups, cakes, receptions, and outdoor catering events."
+          subtitle="A snapshot of weddings, ruracios, koitos, graduations, thanksgiving ceremonies, and corporate event setups."
         />
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {portfolio.map((item, idx) => (

@@ -5,9 +5,10 @@ export default function Footer() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-white">Reach Us</p>
         <p className="text-xl font-extrabold text-white">Contact Victor&apos;s Events</p>
         <p className="mx-auto max-w-3xl text-base font-bold text-white">
-          We are available 24/7 for bookings, planning calls, and on-site coordination.
+          To craft memorable events that exceed expectations through creativity, expertise, and passion.
         </p>
-        <p className="pt-2 text-sm font-semibold text-white/90">Victor&apos;s Events - Nakuru | We value you, our boss.</p>
+        <p className="pt-1 text-sm font-semibold text-white/90">Jerusalem Building, G04 & G05, Nakuru | P.O BOX 17448-20100</p>
+        <p className="pt-1 text-sm font-semibold text-white/90">0726965477 / 0723066340</p>
       </div>
     </footer>
   );
